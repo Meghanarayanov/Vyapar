@@ -599,8 +599,7 @@ urlpatterns = [
     path('purchase_order_item',views.purchase_order_item,name='purchase_order_item'),
     path('sharepurchaseorderitemToEmail/', views.sharepurchaseorderitemToEmail, name='sharepurchaseorderitemToEmail'),
     #---------------- END -------------------> 
-      #---------------- Balance Sheet - Megha O V -------------------> 
-    path('balance_sheet_report',views.balance_sheet_report,name='balance_sheet_report'),
+     
     # trial balance
     path('trial_balance', views.trial_balance, name='trial_balance'),
     path('trial_balance_date_filter', views.trial_balance_date_filter, name='trial_balance_date_filter'),
@@ -641,6 +640,11 @@ urlpatterns = [
     path('profit_loss_vertical',views.profit_loss_vertical,name='profit_loss_vertical'),
     path('profit_loss_mail',views.profit_loss_mail,name='profit_loss_mail'),
     path('profit_loss_mail_h',views.profit_loss_mail_h,name='profit_loss_mail_h'),
+     #---------------- Balance Sheet - Megha O V -------------------> 
+    path('balance_sheet_report',views.balance_sheet_report,name='balance_sheet_report'),
+    path('vertical_balancesheet',views.vertical_balancesheet,name='vertical_balancesheet'),
+    path('balancesheet_mail_horizontal',views.balancesheet_mail_horizontal,name='balancesheet_mail_horizontal'),
+     path('balancesheet_mail_vertical',views.balancesheet_mail_vertical,name='balancesheet_mail_vertical'),
 
 
 

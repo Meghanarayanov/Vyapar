@@ -203,7 +203,8 @@
         }
     }
     .table-container {
-        display: flex;
+        display:flex;
+        flex-direction:column;
     }
     .table-container table {
         border-collapse: collapse;
@@ -359,7 +360,7 @@
 
                     <div class="row mx-1">
                         <div class="col-md-2">
-                            <a role="button" style=" margin-left: 1vw;" class="btn btn-secondary" href="{% url 'vertical_balancesheet' %}">Show Vertical Balace Sheet</a>
+                            <a role="button" style=" margin-left: 1vw;" class="btn btn-secondary" href="{% url 'balance_sheet_report' %}">Show Horizontal Balace Sheet</a>
                         </div>
                         <div class="col-md-6"></div>
                         
@@ -370,7 +371,7 @@
                             <div class="mt-3  " style="width: 97%;"id="tablediv">
                                 <div  class="table-container table-responsive" >
                                 
-                                <table class="table  table-bordered table-info  tb w-50" id="table1"  style="text-align: center;">
+                                <table class="table  table-bordered table-info  tb w-100" id="table1"  style="text-align: center;">
                                     <tr class="fs-4" >
                                     
                                         <th >LIABILITY</th>
@@ -447,7 +448,7 @@
                                     <!-- Add more rows as needed -->
                                 
                                 </table>
-                                <table class="table  table-bordered table-info  tb w-50"  style="text-align: center;" id="table2">
+                                <table class="table  table-bordered table-info  tb w-100"  style="text-align: center;" id="table2">
                                     <tr class="fs-4">
                                         <th>ASSETS</th>
                                         <th>AMOUNT</th>
@@ -535,22 +536,22 @@
                                           <button type="button" class="btn-close" data-dismiss="modal" onclick="toggleDropdownShare()"></button>
                                         </div>
                                         <div class="modal-body">
-                                          <form action="{% url 'balancesheet_mail_horizontal' %}" method="post" class="needs-validation" id="share_to_email_form">
-                                            {% csrf_token %}
-                                            <div class="form-group">
-                                                <label for="emailIds" class="mb-2">Email IDs</label>
-                                                <textarea style="background-color: white;"  id="emailIds"name='emailIds' class="form-control" id="emailIds" rows="3" placeholder="Multiple emails can be added by separating with a comma(,)." required></textarea>
-                                            </div>
-                                            <div class="form-group mt-2">
-                                                <label for="item_unitname" class="mb-2">Message(optional)</label>
-                                                <textarea name="email_message" id="email_message" class="form-control" cols="" rows="4" placeholder="This message will be sent along with Invoice details." style="background-color: white;"></textarea>
-                                            </div>
-                                            
-                                            <div class="modal-footer d-flex justify-content-center" style="border-top: 1px solid #ffffff;">
-                                                <button type="submit" class=" w-50 text-uppercase btn btn-danger" style="background-color: rgb(212, 50, 50);"  id="share_with_email">SEND</button>
-                                                <button type="button" class="btn btn-secondary" id="close_modal_btn" data-dismiss="modal">CLOSE</button>
-                                              </div>
-                                          </form>
+                                            <form action="{% url 'balancesheet_mail_vertical' %}" method="post" class="needs-validation" id="share_to_email_form">
+                                                {% csrf_token %}
+                                                <div class="form-group">
+                                                    <label for="emailIds" class="mb-2">Email IDs</label>
+                                                    <textarea style="background-color: white;"  id="emailIds"name='emailIds' class="form-control" id="emailIds" rows="3" placeholder="Multiple emails can be added by separating with a comma(,)." required></textarea>
+                                                </div>
+                                                <div class="form-group mt-2">
+                                                    <label for="item_unitname" class="mb-2">Message(optional)</label>
+                                                    <textarea name="email_message" id="email_message" class="form-control" cols="" rows="4" placeholder="This message will be sent along with Invoice details." style="background-color: white;"></textarea>
+                                                </div>
+                                                
+                                                <div class="modal-footer d-flex justify-content-center" style="border-top: 1px solid #ffffff;">
+                                                    <button type="submit" class=" w-50 text-uppercase btn btn-danger" style="background-color: rgb(212, 50, 50);"  id="share_with_email">SEND</button>
+                                                   
+                                                  </div>
+                                              </form>
                                         </div>
                                         
                                       </div>
@@ -685,7 +686,7 @@
     $('#share_with_email').click(function(event) {
         event.preventDefault();
         $.ajax({
-            url: "{% url 'balancesheet_mail_horizontal' %}",
+            url: "{% url 'balancesheet_mail_vertical' %}",
             type: 'GET',
             csrfmiddlewaretoken: '{{ csrf_token }}',
             data: {
@@ -702,6 +703,7 @@
             },
         });
     });
+
     document.addEventListener('DOMContentLoaded', function () {
         const tables = document.querySelectorAll('.table-container table');
 
