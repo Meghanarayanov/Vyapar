@@ -293,13 +293,13 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label for="fromDate" style="color: black; margin-bottom: 1vh;">From Date:</label>
-                                            <input type="date" class="form-control h-100 border-secondary" id="fromDate" style="color: black; background-color: white;" onchange="trial_balance_date_filter()"> 
+                                            <input type="date" class="form-control h-100 border-secondary" id="fromDate" style="color: black; background-color: white;" value="{{ from_date }}"> 
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label for="toDate" style="color: black; margin-bottom: 1vh;">To Date:</label>
-                                            <input type="date" class="form-control h-100 border-secondary" id="toDate" style="color: black; background-color: white;" onchange="trial_balance_date_filter()">
+                                            <input type="date" class="form-control h-100 border-secondary" id="toDate" style="color: black; background-color: white;" value="{{ to_date }}">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
@@ -368,7 +368,7 @@
                     <div class="row mx-1">
                         <div class="col-md-12" style="margin-left: 2vh;">
                             <div class="mt-3  " style="width: 97%;"id="tablediv">
-                                <div  class="table-container table-responsive" >
+                                <div  class="table-container table-responsive"  >
                                 
                                 <table class="table  table-bordered table-info  tb w-50" id="table1"  style="text-align: center;">
                                     <tr class="fs-4" >
@@ -395,23 +395,27 @@
                                     <tr style=" font-size:0.8rem;font-weight:bold">
                                         <td class="expandable-one">LOANS (Liabilities)</td>
                                         <td class="expandable-one"></td>
-                                        <td class="expandable-one">0.00</td>
+                                        <td class="expandable-one">{{total_loan}}</td>
                                     </tr>
+                                    {% for i in bank_ac %}
                                     <tr class="hidden-row expandable-content-one" style=" font-size:0.8rem;">
                                         <td>BANK A/C</td>
-                                        <td></td>
+                                        <td>{{i.current_balance}}</td>
                                         <td></td>
                                     </tr>
+                                    {% endfor %}
                                     <tr class="hidden-row expandable-content-one" style=" font-size:0.8rem;">
                                         <td>SECURED LOAN</td>
                                         <td></td>
                                         <td></td>
                                     </tr>
+                                    {% for i in loan_ac %}
                                     <tr class="hidden-row expandable-content-one" style=" font-size:0.8rem;">
                                         <td>BANK LOAN</td>
-                                        <td></td>
+                                        <td>{{ i.total_amount}}</td>
                                         <td></td>
                                     </tr>
+                                    {% endfor %}
                                     <tr style=" font-size:0.8rem;font-weight:bold">
                                         <td class="expandable-one">CURRENT LIABILTIES</td>
                                         <td class="expandable-one"></td>
@@ -548,7 +552,7 @@
                                             
                                             <div class="modal-footer d-flex justify-content-center" style="border-top: 1px solid #ffffff;">
                                                 <button type="submit" class=" w-50 text-uppercase btn btn-danger" style="background-color: rgb(212, 50, 50);"  id="share_with_email">SEND</button>
-                                                <button type="button" class="btn btn-secondary" id="close_modal_btn" data-dismiss="modal">CLOSE</button>
+                                                
                                               </div>
                                           </form>
                                         </div>
@@ -558,9 +562,6 @@
                                 </div>
                        
 <script>
-
-
-
     document.getElementById('fromDate').addEventListener('change', filterDates);
     document.getElementById('toDate').addEventListener('change', filterDates);
 
@@ -569,6 +570,22 @@
         var toDate = document.getElementById("toDate").value;
         window.location.href = `?from_date=${fromDate}&to_date=${toDate}`;
     }
+    $('#fromDate').on('change', function () {
+        var startDate = new Date(document.getElementById("fromDate").value);
+        document.getElementById("s1date").innerHTML =String(startDate.toLocaleDateString()) + ' TO ';
+        fromDate = $(this).val();
+        $('#toDate').prop('min', fromDate);
+        filterByDate();
+    });
+    $('#toDate').on('change', function () {
+        var endDate = new Date($('#toDate').val());
+        document.getElementById("e1date").innerHTML = endDate.toLocaleDateString();
+        toDate = $(this).val();
+        $('#fromDate').prop('max', toDate);
+        filterByDate();
+    
+    });
+   
 
     function printfunction() {
     var printContents = document.getElementById("tablediv").outerHTML; 

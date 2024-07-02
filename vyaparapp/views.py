@@ -21235,6 +21235,7 @@ def profit_loss_mail_h(request):
     else:
         message = 'Report cannot be sent..!'
         return JsonResponse({'message': message}) 
+
 def balance_sheet_report(request):
     if 'staff_id' not in request.session:
         return redirect('/')
@@ -21242,117 +21243,41 @@ def balance_sheet_report(request):
     staff_id = request.session['staff_id']
 
     try:
-        
         staff = staff_details.objects.get(id=staff_id)
         company_instance = company.objects.get(id=staff.company.id)
         
+        bank_account = BankModel.objects.filter(company=company_instance)
+        loan_account = LoanAccounts.objects.filter(company=company_instance)
         
-        item_queryset = ItemModel.objects.filter(company=company_instance)
-        purchase = PurchaseBill.objects.filter(company=company_instance)
-        purdebit = purchasedebit.objects.filter(company=company_instance)
-        exp = Expense.objects.filter(expense_category_id__staff__company=company_instance)
-        sale = SalesInvoice.objects.filter(company=company_instance)  
-        cnote = CreditNote.objects.filter(company=company_instance)  
-        pbill = PurchaseBillItem.objects.filter(company=company_instance)
-        
-        salesinvoice = SalesInvoiceItem.objects.filter(company=company_instance)
-        salesitem = sales_item.objects.filter(cmp=company_instance)
-        
-        allmodules = modules_list.objects.get(company=staff.company, status='New')
-
         from_date = request.GET.get('from_date')
         to_date = request.GET.get('to_date')
-
+        allmodules = modules_list.objects.get(company=staff.company, status='New')
+        # Initialize bank_ac and loan_ac with all records if from_date and to_date are not provided
         
+        totalloan=0
         if from_date and to_date:
             date_range = [from_date, to_date]
-            item_queryset = item_queryset.filter(item_date__range=date_range)
-            purdebit = purdebit.filter(debitdate__range=date_range)
-            cnote = cnote.filter(date__range=date_range)
-            purchase = purchase.filter(billdate__range=date_range)
-            exp = exp.filter(expense_date__range=date_range)
-            sale = sale.filter(date__range=date_range)
-
-            
-            pbill = pbill.filter(purchasebill__billdate__range=date_range)
-            
-            salesinvoice = salesinvoice.filter(salesinvoice__date__range=date_range)
-            salesitem = salesitem.filter(sale_order__orderdate__range=date_range)  
-
-        
-        total_purchase_amount = purchase.aggregate(total=Sum('subtotal'))['total'] or 0
-        total_purdebit_amount = purdebit.aggregate(total=Sum('subtotal'))['total'] or 0
-        total_cnote_amount = cnote.aggregate(total=Sum('subtotal'))['total'] or 0
-        total_exp_amount = exp.aggregate(total=Sum('Sub_total'))['total'] or 0
-        total_sale_amount = sale.aggregate(total=Sum('subtotal'))['total'] or 0
-        total_current_stock = item_queryset.aggregate(total=Sum('item_current_stock'))['total'] or 0
-        total_item_amount = item_queryset.aggregate(total=Sum('item_sale_price'))['total'] or 0
-        total_discount_pbill = pbill.aggregate(total=Sum('discount'))['total'] or 0
-        
-        total_discount_sinoitem = salesinvoice.aggregate(total=Sum('discount'))['total'] or 0
-        total_discount_salesitem = salesitem.aggregate(total=Sum('discount'))['total'] or 0
-
-        
-        total_purchase_amount = Decimal(total_purchase_amount)
-        total_purdebit_amount = Decimal(total_purdebit_amount)
-        total_cnote_amount = Decimal(total_cnote_amount)
-        total_exp_amount = Decimal(total_exp_amount)
-        total_sale_amount = Decimal(total_sale_amount)
-        total_current_stock = Decimal(total_current_stock)
-        total_item_amount = Decimal(total_item_amount)
-        total_discount_pbill = Decimal(total_discount_pbill)
-        
-        total_discount_sinoitem = Decimal(total_discount_sinoitem)
-        total_discount_salesitem = Decimal(total_discount_salesitem)
-
-        total_sale = total_sale_amount - total_cnote_amount
-        total_purchase = total_purchase_amount - total_purdebit_amount
-        
-        discount_paid = total_discount_sinoitem + total_discount_salesitem
-        
-        total = total_item_amount + total_purchase + total_exp_amount + discount_paid
-        total2 = total_sale_amount + total_current_stock + total_discount_pbill
-        ind_exp = total_exp_amount + discount_paid
-
-        nett_profit = nett_loss = None
-        if total > total2:
-            nett_loss = total - total2
-        elif total2 > total:
-            nett_profit = total2 - total
-
+            bank_ac = bank_account.filter(bank_ac_date__range=date_range)
+            loan_ac = loan_account.filter(loan_ac_date__range=date_range)
+            totalloan+=bank_ac+loan_ac
+        print(bank_account)
+        print(totalloan)
         context = {
             'staff': staff,
-            'item_queryset': item_queryset,
-            'purchase': purchase,
-            'exp': exp,
-            'sale': sale,
-            'allmodules': allmodules,
-            'from_date': from_date,
-            'to_date': to_date,
-            'total_purchase_amount': total_purchase_amount,
-            'total_exp_amount': total_exp_amount,
-            'total_sale_amount': total_sale_amount,
-            'total_item_amount': total_item_amount,
-            'total_current_stock': total_current_stock,
-            'total': total,
-            'total2': total2,
             
-            'discount_paid': discount_paid,
-            'total_discount_pbill':total_discount_pbill,
-            'nett_profit': nett_profit,
-            'nett_loss': nett_loss,
+            'bank_ac': bank_account,
+            'loan_ac': loan_account,
             'from_date': from_date,
             'to_date': to_date,
-            'ind_exp': ind_exp,
-            'total_purchase': total_purchase,
-            'total_sale':total_sale,
+            'allmodules':allmodules,
+            'total_loan':totalloan
         }
 
         return render(request, 'company/balancesheet.html', context)
 
     except (staff_details.DoesNotExist, company.DoesNotExist, modules_list.DoesNotExist):
         return redirect('/')
-   
+  
 def vertical_balancesheet(request):
     if 'staff_id' not in request.session:
         return redirect('/')
