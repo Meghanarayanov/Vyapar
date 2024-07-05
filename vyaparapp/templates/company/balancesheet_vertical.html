@@ -293,14 +293,14 @@
                             <div class="row mx-3">
                                     <div class="col-md-2">
                                         <div class="form-group">
-                                            <label for="fromDate" style="color: black; margin-bottom: 1vh;">From Date:</label>
-                                            <input type="date" class="form-control h-100 border-secondary" id="fromDate" style="color: black; background-color: white;" onchange="trial_balance_date_filter()"> 
+                                            <label for="fromDate" style="color: black; margin-bottom: 1vh;">From :</label>
+                                            <input type="date" class="form-control h-100 p-2 border-secondary" id="fromDate" style="color: black; background-color: white;" onchange="trial_balance_date_filter()"> 
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
-                                            <label for="toDate" style="color: black; margin-bottom: 1vh;">To Date:</label>
-                                            <input type="date" class="form-control h-100 border-secondary" id="toDate" style="color: black; background-color: white;" onchange="trial_balance_date_filter()">
+                                            <label for="toDate" style="color: black; margin-bottom: 1vh;">To :</label>
+                                            <input type="date" class="form-control h-100 p-2 border-secondary" id="toDate" style="color: black; background-color: white;" onchange="trial_balance_date_filter()">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
@@ -378,73 +378,84 @@
                                         <th>AMOUNT</th>
                                         <th>AMOUNT</th>
                                     </tr>
-                                    <tr style=" font-size:0.8rem;font-weight:bold">
-                                        <td class="expandable-one" >CAPITAL ACCOUNT</td>
-                                        <td class="expandable-one"></td>
-                                        <td class="expandable-one">0.00</td>
+                                    <tr style="font-size:0.8rem; font-weight:bold;">
+                                        <td class="expandable-one" data-target="#capital-account">CAPITAL ACCOUNT</td>
+                                        <td class="expandable-one" data-target="#capital-account"></td>
+                                        <td class="expandable-one" data-target="#capital-account">0.00</td>
                                     </tr>
-                                    <tr class="hidden-row expandable-content-one" style=" font-size:0.8rem;">
+                                    <tr class="hidden-row expandable-content-one" id="capital-account" style="font-size:0.8rem;">
                                         <td>DRAWINGS OF OWNER</td>
                                         <td></td>
                                         <td></td>
                                     </tr>
-                                    <tr class="hidden-row expandable-content-one" style=" font-size:0.8rem;">
+                                    <tr class="hidden-row expandable-content-one" id="capital-account" style="font-size:0.8rem;">
                                         <td>OWNER CAPITAL</td>
                                         <td></td>
                                         <td></td>
                                     </tr>
-                                    <tr style=" font-size:0.8rem;font-weight:bold">
-                                        <td class="expandable-one">LOANS (Liabilities)</td>
-                                        <td class="expandable-one"></td>
-                                        <td class="expandable-one">0.00</td>
+                                    <tr style="font-size:0.8rem; font-weight:bold;">
+                                        <td class="expandable-one" data-target="#loans">LOANS (Liabilities)</td>
+                                        <td class="expandable-one" data-target="#loans"></td>
+                                        <td class="expandable-one" data-target="#loans">{{total_loan_amount}}</td>
                                     </tr>
-                                    <tr class="hidden-row expandable-content-one" style=" font-size:0.8rem;">
+                                    {% for i in bank_ac %}
+                                    <tr class="hidden-row expandable-content-one" id="loans" style="font-size:0.8rem;">
                                         <td>BANK A/C</td>
-                                        <td></td>
+                                        <td>{{i.current_balance}}</td>
                                         <td></td>
                                     </tr>
-                                    <tr class="hidden-row expandable-content-one" style=" font-size:0.8rem;">
+                                    {% endfor %}
+                                    <tr class="hidden-row expandable-content-one" id="loans" style="font-size:0.8rem;">
                                         <td>SECURED LOAN</td>
                                         <td></td>
                                         <td></td>
                                     </tr>
-                                    <tr class="hidden-row expandable-content-one" style=" font-size:0.8rem;">
+                                    {% for i in loan_ac %}
+                                    <tr class="hidden-row expandable-content-one" id="loans" style="font-size:0.8rem;">
                                         <td>BANK LOAN</td>
-                                        <td></td>
+                                        <td>{{ i.total_amount }}</td>
                                         <td></td>
                                     </tr>
-                                    <tr style=" font-size:0.8rem;font-weight:bold">
-                                        <td class="expandable-one">CURRENT LIABILTIES</td>
-                                        <td class="expandable-one"></td>
-                                        <td class="expandable-one">0.00</td>
+                                    {% endfor %}
+                                    <tr style="font-size:0.8rem; font-weight:bold;">
+                                        <td class="expandable-one" data-target="#current-liabilities">CURRENT LIABILITIES</td>
+                                        <td class="expandable-one" data-target="#current-liabilities"></td>
+                                        <td class="expandable-one" data-target="#current-liabilities">{{current_liability_total}}</td>
                                     </tr>
-                                    <tr class="hidden-row expandable-content-one" style=" font-size:0.8rem;">
+                                    <tr class="hidden-row expandable-content-one" id="current-liabilities" style="font-size:0.8rem;">
                                         <td>DUTIES AND TERMS</td>
                                         <td></td>
                                         <td></td>
                                     </tr>
-                                    <tr class="hidden-row expandable-content-one" style=" font-size:0.8rem;">
+                                    <tr class="hidden-row expandable-content-one" id="current-liabilities" style="font-size:0.8rem;">
                                         <td>PROVISIONS</td>
                                         <td></td>
                                         <td></td>
                                     </tr>
-                                    <tr class="hidden-row expandable-content-one" style=" font-size:0.8rem;">
-                                        <td>SUNDRY CREDITORS</td>
-                                        <td></td>
+                                    <tr  class="hidden-row expandable-content-one" id="current-liabilities" style="font-size:0.8rem; ">
+                                        <td class="expandable-one" data-target="#sundry-creditors">SUNDRY CREDITORS</td>
+                                        <td class="expandable-one" data-target="#sundry-creditors">{{ sundry_creditors_total}}</td>
+                                        <td class="expandable-one" data-target="#sundry-creditors"></td>
+                                    </tr>
+                                    {% for creditor in sundry_creditors %}
+                                    <tr class="hidden-row expandable-content-one" id="sundry-creditors" style="font-size:0.8rem;">
+                                        <td>{{ creditor.party_name }}</td>
+                                        <td>{{ creditor.totalbalance }}</td>
                                         <td></td>
                                     </tr>
-                                    <tr style=" font-size:0.8rem;font-weight:bold">
-                                        <td class="expandable-one">PROFIT</td>
-                                        <td class="expandable-one"></td>
-                                        <td class="expandable-one">0.00</td>
+                                    {% endfor %}
+                                    <tr style="font-size:0.8rem; font-weight:bold;">
+                                        <td class="expandable-one" data-target="#profit">PROFIT</td>
+                                        <td class="expandable-one" data-target="#profit"></td>
+                                        <td class="expandable-one" data-target="#profit">0.00</td>
                                     </tr>
-                                    
+                                
                                     <tr style=" font-size:0.8rem;font-weight:bold">
                                         <td class="expandable-one">TOTAL</td>
                                         <td class="expandable-one"></td>
                                         <td class="expandable-one">0.00</td>
                                     </tr>
-                                   
+                               
                                     <!-- Add more rows as needed -->
                                 
                                 </table>
@@ -461,22 +472,22 @@
                                     </tr>
                                     <tr class="hidden-row expandable-content-two" style=" font-size:0.8rem;">
                                         <td>COMPUTER</td>
-                                        <td></td>
+                                        <td>0.00</td>
                                         <td></td>
                                     </tr>
                                     <tr class="hidden-row expandable-content-two" style=" font-size:0.8rem;">
                                         <td>FURNITURE</td>
-                                        <td></td>
+                                        <td>0.00</td>
                                         <td></td>
                                     </tr>
                                     <tr class="hidden-row expandable-content-two" style=" font-size:0.8rem;">
                                         <td>LAND AND BUILDING</td>
-                                        <td></td>
+                                        <td>0.00</td>
                                         <td></td>
                                     </tr>
                                     <tr class="hidden-row expandable-content-two" style=" font-size:0.8rem;">
                                         <td>MARUTI VAN</td>
-                                        <td></td>
+                                        <td>0.00</td>
                                         <td></td>
                                     </tr>
                                     <tr style=" font-size:0.8rem;font-weight:bold">
@@ -486,17 +497,17 @@
                                     </tr>
                                     <tr class="hidden-row expandable-content-two" style=" font-size:0.8rem;">
                                         <td>COMMODITIES</td>
-                                        <td></td>
+                                        <td>0.00</td>
                                         <td></td>
                                     </tr>
                                     <tr style=" font-size:0.8rem;font-weight:bold">
                                         <td class="expandable-two">CURRENT ASSETS</td>
                                         <td class="expandable-two"></td>
-                                        <td class="expandable-two">0.00</td>
+                                        <td class="expandable-two">{{current_assets_total}}</td>
                                     </tr>
                                     <tr class="hidden-row expandable-content-two" style=" font-size:0.8rem;">
                                         <td>OPENING STOCK</td>
-                                        <td></td>
+                                        <td>{{opening_stocks_total}}</td>
                                         <td></td>
                                     </tr>
                                     <tr class="hidden-row expandable-content-two" style=" font-size:0.8rem;">
@@ -510,10 +521,17 @@
                                         <td></td>
                                     </tr>
                                     <tr class="hidden-row expandable-content-two" style=" font-size:0.8rem;">
-                                        <td>SUNDRY DEBITORS</td>
-                                        <td></td>
+                                        <td class="expandable-one" data-target="#sundry-debitors">SUNDRY DEBITORS</td>
+                                        <td class="expandable-one" data-target="#sundry-debitors">{{sundry_debitors_total}}</td>
+                                        <td class="expandable-one" data-target="#sundry-debitors"></td>
+                                    </tr>
+                                    {% for debitor in sundry_debitors %}
+                                    <tr class="hidden-row expandable-content-one" id="sundry-debitors" style="font-size:0.8rem;">
+                                        <td>{{ debitor.party.party_name }}</td>
+                                        <td>{{ debitor.balance }}</td>
                                         <td></td>
                                     </tr>
+                                    {% endfor %}
                                     <tr >
                                         <td class="expandable-two">---</td>
                                         <td class="expandable-two">---</td>
@@ -522,7 +540,7 @@
                                     <tr style=" font-size:0.8rem;font-weight:bold">
                                         <td class="expandable-two">TOTAL</td>
                                         <td class="expandable-two"></td>
-                                        <td class="expandable-two">0.00</td>
+                                        <td class="expandable-two">{{total_assets}}</td>
                                     </tr>
                                     <!-- Add more rows as needed -->
                                 </table>
