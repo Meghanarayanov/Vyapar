@@ -204,6 +204,7 @@
     }
     .table-container {
         display: flex;
+        flex-direction: row;
     }
     .table-container table {
         border-collapse: collapse;
@@ -370,7 +371,7 @@
                             <div class="mt-3  " style="width: 97%;"id="tablediv">
                                 <div  class="table-container table-responsive"  >
                                 
-                                    <table id="reportTable" class="table table-bordered table-hover table-info tb w-50" id="table1" style="text-align: center;" >
+                                    <table id="Table1" class="table table-bordered table-hover table-info tb w-50 reportTable" id="table1" style="text-align: center;" >
                                       <thead>
                                         <tr class="fs-4">
                                             <th>LIABILITY</th>
@@ -462,7 +463,7 @@
                                         </tr>
                                     </table>
                                 
-                                    <table  id="reportTable" class="table table-bordered table-hover table-info tb w-50" style="text-align: center;" >
+                                    <table  id="Table2" class="table table-bordered table-hover table-info tb w-50 reportTable" style="text-align: center;" >
                                         <thead>
                                         <tr class="fs-4">
                                             <th>ASSETS</th>
@@ -561,7 +562,7 @@
                                     <div class="modal-dialog" >
                                       <div class="modal-content" style=" background-color:rgb(85, 188, 248);border-radius: 3px;">
                                         <div class="modal-header" style="border-bottom: 1px solid #ffffff;">
-                                          <h5 class="modal-title text-dark" id="shareBillEmailLabel">Share Invoice Via Email</h5>
+                                          <h5 class="modal-title text-dark" id="shareBillEmailLabel">Share Balance Sheet Via Email</h5>
                                           <button type="button" class="btn-close" data-dismiss="modal" onclick="toggleDropdownShare()"></button>
                                         </div>
                                         <div class="modal-body">
@@ -573,7 +574,7 @@
                                             </div>
                                             <div class="form-group mt-2">
                                                 <label for="item_unitname" class="mb-2">Message(optional)</label>
-                                                <textarea name="email_message" id="email_message" class="form-control" cols="" rows="4" placeholder="This message will be sent along with Invoice details." style="background-color: white;"></textarea>
+                                                <textarea name="email_message" id="email_message" class="form-control" cols="" rows="4" placeholder="This message will be sent along with invoice details." style="background-color: white;"></textarea>
                                             </div>
                                             
                                             <div class="modal-footer d-flex justify-content-center" style="border-top: 1px solid #ffffff;">
@@ -590,28 +591,27 @@
 <script>
     document.getElementById('fromDate').addEventListener('change', filterDates);
     document.getElementById('toDate').addEventListener('change', filterDates);
-
+    
     function filterDates() {
         var fromDate = document.getElementById("fromDate").value;
         var toDate = document.getElementById("toDate").value;
-        window.location.href = `?from_date=${fromDate}&to_date=${toDate}`;
-    }
-    $('#fromDate').on('change', function () {
-        var startDate = new Date(document.getElementById("fromDate").value);
-        document.getElementById("s1date").innerHTML =String(startDate.toLocaleDateString()) + ' TO ';
-        fromDate = $(this).val();
-        $('#toDate').prop('min', fromDate);
-        filterByDate();
-    });
-    $('#toDate').on('change', function () {
-        var endDate = new Date($('#toDate').val());
-        document.getElementById("e1date").innerHTML = endDate.toLocaleDateString();
-        toDate = $(this).val();
-        $('#fromDate').prop('max', toDate);
-        filterByDate();
     
+        if (fromDate && toDate) {
+            window.location.href = `?from_date=${fromDate}&to_date=${toDate}`;
+        }
+    }
+    
+    $('#fromDate').on('change', function () {
+        var fromDate = $(this).val();
+        $('#toDate').prop('min', fromDate);
+        filterDates();
     });
-   
+    
+    $('#toDate').on('change', function () {
+        var toDate = $(this).val();
+        $('#fromDate').prop('max', toDate);
+        filterDates();
+    });
 
     function printfunction() {
     var printContents = document.getElementById("tablediv").outerHTML; 
@@ -620,11 +620,14 @@
     // Add CSS styles for right alignment of integer values
     var customStyle = `
         <style>
-            .total-amount, .amount {
-                float: right;
-                text-align: right;
-            }
-            
+              .table-container {
+                    display: flex;
+                    flex-direction: row;
+                }
+                
+                .table-container td, .table-container th {
+                    text-align: right; /* Right align integer values */
+                }
         </style>
     `;
 
@@ -639,22 +642,45 @@
     window.location.reload();
 }
 
+function ExportToExcel() {
+    var table1 = document.getElementById('Table1');
+    var table2 = document.getElementById('Table2');
 
+    // Create a new table element
+    var newTable = document.createElement('table');
+    newTable.setAttribute('id', 'MergedTable');
+    newTable.setAttribute('class', 'table table-bordered table-hover table-info tb w-100 reportTable');
+    newTable.style.textAlign = 'center';
 
-function ExportToExcel(){
-    var dt = `{{currentDate}}`
-    if(dt != 'None'){
-        var date = dt
-    }else{
-        var date = `{{startDate}}`+"_"+`{{endDate}}`
+    // Extract and merge headers
+    var header1 = table1.querySelector('thead');
+    var header2 = table2.querySelector('thead');
+    var mergedHeader = '<thead><tr>' + header1 + header2 + '</tr></thead>';
+    newTable.innerHTML = mergedHeader;
+
+    // Extract and merge rows
+    var rows1 = table1.querySelectorAll('tr');
+    var rows2 = table2.querySelectorAll('tr');
+    var maxLength = Math.max(rows1.length, rows2.length);
+
+    for (var i = 0; i < maxLength; i++) {
+        var row1 = rows1[i] ? rows1[i].innerHTML : '<td colspan="3"></td>';
+        var row2 = rows2[i] ? rows2[i].innerHTML : '<td colspan="3"></td>';
+        var mergedRow = '<tr>' + row1 + row2 + '</tr>';
+        newTable.innerHTML += mergedRow;
     }
-    const Table = document.getElementById("reportTablevf   gngvb ");
-    const ws = XLSX.utils.book_to_sheet(Table);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    XLSX.writeFile(wb, "Report_HORIZONTAL_PROFIT & LOSS A/C_"+".xlsx");
-}
 
+    // Convert the new table to a workbook
+    var workbook = XLSX.utils.table_to_book(newTable, { sheet: "Sheet 1" });
+    var fromDate = document.getElementById("fromDate").value;
+    var toDate = document.getElementById("toDate").value;
+    var filename = `Balancesheet${fromDate}_to_${toDate}.xlsx`;
+
+    // Set the column width for the first column (index 0)
+    workbook.Sheets["Sheet 1"]["!cols"] = [{ wpx: 150 }, { wpx: 150 }, { wpx: 150 }, { wpx: 150 }, { wpx: 150 }, { wpx: 150 }];
+
+    XLSX.writeFile(workbook, filename);
+}
 
     
     function generatePDF() {
@@ -747,7 +773,7 @@ function ExportToExcel(){
             },
             success: function(response) {
                 $('#share_to_email_form')[0].reset();
-                document.getElementById("close_modal_btn").click();
+               
                 alert(response.message);
             },
         });

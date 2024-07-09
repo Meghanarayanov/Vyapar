@@ -52,7 +52,7 @@
             <tbody>
                 <tr style="font-weight: bold;">
                     <td>Address</td>
-                    
+                    <td>Contact</td>
                 </tr>
                 <tr>
                     <td>
@@ -63,7 +63,11 @@
                             {{ staff.company.contact }} 
                         </p>
                     </td>
-                   
+                    <td>
+                        <p style="color: #000;">
+                            {{ staff.company.contact }}
+                        </p>
+                    </td>
                 </tr>
             </tbody>
         </table><br>
@@ -93,10 +97,10 @@
 
             <tbody>
                 <tr>
-                    <td class="expandable-one " style="font-weight:bold;">CAPITAL ACCOUNT</td>
+                    <td class="expandable-one">CAPITAL ACCOUNT</td>
                     <td></td>
                     <td>0.00</td>
-                    <td class="expandable-two"  style="font-weight:bold;">FIXED ASSETS</td>
+                    <td class="expandable-two">FIXED ASSETS</td>
                     <td></td>
                     <td>0.00</td>
                 </tr>
@@ -117,7 +121,7 @@
                     <td></td>
                 </tr>
                 <tr>
-                    <td class="expandable-one"  style="font-weight:bold;">LOANS (Liabilities)</td>
+                    <td class="expandable-one">LOANS (Liabilities)</td>
                     <td></td>
                     <td>{{ total_loan_amount|default:0|floatformat:2 }}</td>
                     <td>LAND AND BUILDING</td>
@@ -140,7 +144,7 @@
                     <td>SECURED LOAN</td>
                     <td></td>
                     <td></td>
-                    <td class="expandable-two"  style="font-weight:bold;">INVESTMENTS</td>
+                    <td class="expandable-two">INVESTMENTS</td>
                     <td></td>
                     <td>0.00</td>
                 </tr>
@@ -154,17 +158,15 @@
                     <td></td>
                 </tr>
                 <tr>
-                    {% for i in loan_ac %}
                     <td>BANK LOAN</td>
                     <td>{{ i.total_amount|default:0|floatformat:2 }}</td>
                     <td></td>
-                    {% endfor %}
-                    <td class="expandable-two"  style="font-weight:bold;">CURRENT ASSETS</td>
+                    <td class="expandable-two">CURRENT ASSETS</td>
                     <td></td>
                     <td>{{ current_assets_total|default:0|floatformat:2 }}</td>
                 </tr>
                 <tr>
-                    <td class="expandable-one"  style="font-weight:bold;">CURRENT LIABILITIES</td>
+                    <td class="expandable-one">CURRENT LIABILITIES</td>
                     <td></td>
                     <td>{{ current_liability_total|default:0|floatformat:2 }}</td>
                     <td>OPENING STOCK</td>
@@ -198,52 +200,45 @@
                 </tr>
                 <tr>
                     {% for creditor in sundry_creditors %}
-                    <tr>
+                    
                         <td>{{ creditor.party_name }}</td>
                         <td>{{ creditor.totalbalance|default:0|floatformat:2 }}</td>
                         <td></td>
-                        
-                        
-                    </tr>
+                    
                     {% endfor %}
 
                     {% for debitor in sundry_debitors %}
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
                         <td>{{ debitor.party.party_name }}</td>
                         <td>{{ debitor.balance|default:0|floatformat:2 }}</td>
                         <td></td>
-                    </tr>    
                     {% endfor %}
                 </tr>
                 <tr>
                     {% if nett_profit %}
-                    <td class="expandable-one" data-target="#profit" style="font-weight:bold;">PROFIT</td>
+                    <td class="expandable-one" data-target="#profit">PROFIT</td>
                     <td data-target="#profit"></td>
                     <td data-target="#profit">{{ nett_profit|default:0|floatformat:2 }}</td>
                     {% else %}
-                    <td class="expandable-one" style="font-weight:bold;">PROFIT</td>
+                    <td class="expandable-one">PROFIT</td>
                     <td>--</td>
                     <td class="text-center">--</td>
                     {% endif %}
                     {% if nett_loss %}
-                    <td class="expandable-two"  style="font-weight:bold;">LOSS</td>
+                    <td class="expandable-two">LOSS</td>
                     <td></td>
                     <td>{{ nett_loss|default:0|floatformat:2 }}</td>
                     {% else %}
-                    <td class="expandable-two"  style="font-weight:bold;">LOSS</td>
+                    <td class="expandable-two">LOSS</td>
                     <td>--</td>
                     <td>--</td>
                     {% endif %}
                     
                 </tr>
                 <tr>
-                    <td class="expandable-one"  style="font-weight:bold;">TOTAL</td>
+                    <td class="expandable-one">TOTAL</td>
                     <td></td>
                     <td>{{ total_liability|default:0|floatformat:2 }}</td>
-                    <td class="expandable-two"  style="font-weight:bold;">TOTAL</td>
+                    <td class="expandable-two">TOTAL</td>
                     <td></td>
                     <td>{{ total_assets|default:0|floatformat:2 }}</td>
                 </tr>

@@ -294,13 +294,13 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label for="fromDate" style="color: black; margin-bottom: 1vh;">From :</label>
-                                            <input type="date" class="form-control h-100 p-2 border-secondary" id="fromDate" style="color: black; background-color: white;" onchange="trial_balance_date_filter()"> 
+                                            <input type="date" class="form-control h-100 p-2 border-secondary" id="fromDate" style="color: black; background-color: white;"  value="{{ from_date }}"> 
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label for="toDate" style="color: black; margin-bottom: 1vh;">To :</label>
-                                            <input type="date" class="form-control h-100 p-2 border-secondary" id="toDate" style="color: black; background-color: white;" onchange="trial_balance_date_filter()">
+                                            <input type="date" class="form-control h-100 p-2 border-secondary" id="toDate" style="color: black; background-color: white;" value="{{ to_date }}">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
@@ -579,7 +579,7 @@
                                     <div class="modal-dialog" >
                                       <div class="modal-content" style=" background-color:rgb(85, 188, 248);border-radius: 3px;">
                                         <div class="modal-header" style="border-bottom: 1px solid #ffffff;">
-                                          <h5 class="modal-title text-dark" id="shareBillEmailLabel">Share Invoice Via Email</h5>
+                                          <h5 class="modal-title text-dark" id="shareBillEmailLabel">Share Balance Sheet Via Email</h5>
                                           <button type="button" class="btn-close" data-dismiss="modal" onclick="toggleDropdownShare()"></button>
                                         </div>
                                         <div class="modal-body">
@@ -645,14 +645,18 @@
 }
 
 
+function ExportToExcel() {
+    var table = document.getElementById('tablediv');
+    var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet 1" });    
+    var fromDate = document.getElementById("fromDate").value;
+    var toDate = document.getElementById("toDate").value;
+    var filename = `Balancesheet${fromDate}_to_${toDate}.xlsx`;
 
-    function ExportToExcel() {
-        const table = document.querySelector('#tablediv');
-        const ws = XLSX.utils.table_to_sheet(table);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-        XLSX.writeFile(wb, 'balancesheet.xlsx');
-    }
+    // Set the column width for the first column (index 0)
+    workbook.Sheets["Sheet 1"]["!cols"] = [{ wpx: 150 }, { wpx: 150 }];
+
+    XLSX.writeFile(workbook, filename);
+}
 
     
     function generatePDF() {
@@ -745,7 +749,7 @@
             },
             success: function(response) {
                 $('#share_to_email_form')[0].reset();
-                document.getElementById("close_modal_btn").click();
+                
                 alert(response.message);
             },
         });
