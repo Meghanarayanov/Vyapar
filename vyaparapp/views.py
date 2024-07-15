@@ -21270,30 +21270,26 @@ def balance_sheet_report(request):
         
         # Convert query parameters to strings and parse dates
         if from_date and to_date:
-            from_date = str(from_date)
-            to_date = str(to_date)
             from_date = parse_date(from_date)
             to_date = parse_date(to_date)
         
             # Ensure dates are valid
-            #if not from_date or not to_date:
-                #return HttpResponseBadRequest("Invalid date format")
-            
-            date_range = [from_date, to_date]
-            bank_account = bank_account.filter(as_of_date__range=date_range)
-            loan_account = loan_account.filter(date__range=date_range)
-            balance_amounts = balance_amounts.filter(loan_account__date__range=date_range)
-            sundry_creditors = sundry_creditors.filter(date__range=date_range)
-            opening_stocks = opening_stocks.filter(item_date__range=date_range)
-            sundry_debitors = sundry_debitors.filter(billdate__range=date_range)
-            purdebit = purdebit.filter(debitdate__range=date_range)
-            cnote = cnote.filter(date__range=date_range)
-            purchase = purchase.filter(billdate__range=date_range)
-            exp = exp.filter(expense_date__range=date_range)
-            sale = sale.filter(date__range=date_range)
-            pbill = pbill.filter(purchasebill__billdate__range=date_range)
-            salesinvoice = salesinvoice.filter(salesinvoice__date__range=date_range)
-            salesitem = salesitem.filter(sale_order__orderdate__range=date_range)
+            if from_date and to_date:
+                date_range = [from_date, to_date]
+                bank_account = bank_account.filter(as_of_date__range=date_range)
+                loan_account = loan_account.filter(date__range=date_range)
+                balance_amounts = balance_amounts.filter(loan_account__date__range=date_range)
+                sundry_creditors = sundry_creditors.filter(date__range=date_range)
+                opening_stocks = opening_stocks.filter(item_date__range=date_range)
+                sundry_debitors = sundry_debitors.filter(billdate__range=date_range)
+                purdebit = purdebit.filter(debitdate__range=date_range)
+                cnote = cnote.filter(date__range=date_range)
+                purchase = purchase.filter(billdate__range=date_range)
+                exp = exp.filter(expense_date__range=date_range)
+                sale = sale.filter(date__range=date_range)
+                pbill = pbill.filter(purchasebill__billdate__range=date_range)
+                salesinvoice = salesinvoice.filter(salesinvoice__date__range=date_range)
+                salesitem = salesitem.filter(sale_order__orderdate__range=date_range)
         
         # Aggregate values with default fallback to 0
         total_bank_balance = bank_account.aggregate(total=Sum('current_balance'))['total'] or 0
@@ -21301,11 +21297,9 @@ def balance_sheet_report(request):
         total_loan_amount += total_bank_balance
         sundry_creditors_total = sundry_creditors.aggregate(total=Sum('totalbalance'))['total'] or 0
         current_liability_total = sundry_creditors_total
-        opening_stocks_total = opening_stocks.aggregate(total=Sum('item_opening_stock'))['total'] or 0
+        opening_stocks_total = opening_stocks.aggregate(total=Sum('item_current_stock'))['total'] or 0
         sundry_debitors_total = sundry_debitors.aggregate(total=Sum('balance'))['total'] or 0
         current_assets_total = opening_stocks_total + sundry_debitors_total
-
-        print(current_liability_total)
 
         total_purchase_amount = purchase.aggregate(total=Sum('subtotal'))['total'] or 0
         total_purdebit_amount = purdebit.aggregate(total=Sum('subtotal'))['total'] or 0
@@ -21352,6 +21346,7 @@ def balance_sheet_report(request):
             'sundry_creditors': sundry_creditors,
             'sundry_creditors_total': sundry_creditors_total,
             'current_liability_total': current_liability_total,
+            'opening_stocks':opening_stocks,
             'opening_stocks_total': opening_stocks_total,
             'sundry_debitors': sundry_debitors,
             'sundry_debitors_total': sundry_debitors_total,
@@ -21370,13 +21365,16 @@ def balance_sheet_report(request):
     except (staff_details.DoesNotExist, company.DoesNotExist, modules_list.DoesNotExist):
         return redirect('/')
 
+
+
 def vertical_balancesheet(request):
-  if 'staff_id' not in request.session:
+
+    if 'staff_id' not in request.session:
         return redirect('/')
 
-  staff_id = request.session['staff_id']
+    staff_id = request.session['staff_id']
 
-  try:
+    try:
         staff = staff_details.objects.get(id=staff_id)
         company_instance = company.objects.get(id=staff.company.id)
         item_queryset = ItemModel.objects.filter(company=company_instance)
@@ -21399,9 +21397,135 @@ def vertical_balancesheet(request):
         to_date = request.GET.get('to_date')
         allmodules = modules_list.objects.get(company=staff.company, status='New')
         
+        # Convert query parameters to strings and parse dates
         if from_date and to_date:
-            from_date = str(from_date)
-            to_date = str(to_date)
+            from_date = parse_date(from_date)
+            to_date = parse_date(to_date)
+        
+            # Ensure dates are valid
+            if from_date and to_date:
+                date_range = [from_date, to_date]
+                bank_account = bank_account.filter(as_of_date__range=date_range)
+                loan_account = loan_account.filter(date__range=date_range)
+                balance_amounts = balance_amounts.filter(loan_account__date__range=date_range)
+                sundry_creditors = sundry_creditors.filter(date__range=date_range)
+                opening_stocks = opening_stocks.filter(item_date__range=date_range)
+                sundry_debitors = sundry_debitors.filter(billdate__range=date_range)
+                purdebit = purdebit.filter(debitdate__range=date_range)
+                cnote = cnote.filter(date__range=date_range)
+                purchase = purchase.filter(billdate__range=date_range)
+                exp = exp.filter(expense_date__range=date_range)
+                sale = sale.filter(date__range=date_range)
+                pbill = pbill.filter(purchasebill__billdate__range=date_range)
+                salesinvoice = salesinvoice.filter(salesinvoice__date__range=date_range)
+                salesitem = salesitem.filter(sale_order__orderdate__range=date_range)
+        
+        # Aggregate values with default fallback to 0
+        total_bank_balance = bank_account.aggregate(total=Sum('current_balance'))['total'] or 0
+        total_loan_amount = loan_account.aggregate(total=Sum('total_amount'))['total'] or 0
+        total_loan_amount += total_bank_balance
+        sundry_creditors_total = sundry_creditors.aggregate(total=Sum('totalbalance'))['total'] or 0
+        current_liability_total = sundry_creditors_total
+        opening_stocks_total = opening_stocks.aggregate(total=Sum('item_current_stock'))['total'] or 0
+        sundry_debitors_total = sundry_debitors.aggregate(total=Sum('balance'))['total'] or 0
+        current_assets_total = opening_stocks_total + sundry_debitors_total
+
+        total_purchase_amount = purchase.aggregate(total=Sum('subtotal'))['total'] or 0
+        total_purdebit_amount = purdebit.aggregate(total=Sum('subtotal'))['total'] or 0
+        total_cnote_amount = cnote.aggregate(total=Sum('subtotal'))['total'] or 0
+        total_exp_amount = exp.aggregate(total=Sum('Sub_total'))['total'] or 0
+        total_sale_amount = sale.aggregate(total=Sum('subtotal'))['total'] or 0
+        total_current_stock = item_queryset.aggregate(total=Sum('item_current_stock'))['total'] or 0
+        total_item_amount = item_queryset.aggregate(total=Sum('item_sale_price'))['total'] or 0
+        total_discount_pbill = pbill.aggregate(total=Sum('discount'))['total'] or 0
+        total_discount_sinoitem = salesinvoice.aggregate(total=Sum('discount'))['total'] or 0
+        total_discount_salesitem = salesitem.aggregate(total=Sum('discount'))['total'] or 0
+
+        # Convert to Decimal to ensure consistent type
+        total_purchase_amount = Decimal(total_purchase_amount)
+        total_purdebit_amount = Decimal(total_purdebit_amount)
+        total_cnote_amount = Decimal(total_cnote_amount)
+        total_exp_amount = Decimal(total_exp_amount)
+        total_sale_amount = Decimal(total_sale_amount)
+        total_current_stock = Decimal(total_current_stock)
+        total_item_amount = Decimal(total_item_amount)
+        total_discount_pbill = Decimal(total_discount_pbill)
+        total_discount_sinoitem = Decimal(total_discount_sinoitem)
+        total_discount_salesitem = Decimal(total_discount_salesitem)
+
+        total_sale = total_sale_amount - total_cnote_amount
+        total_purchase = total_purchase_amount - total_purdebit_amount
+        discount_paid = total_discount_sinoitem + total_discount_salesitem
+        total = total_item_amount + total_purchase + total_exp_amount + discount_paid
+        total2 = total_sale_amount + total_current_stock + total_discount_pbill
+
+        nett_profit = nett_loss = Decimal(0)
+        if total > total2:
+            nett_loss = total - total2
+        elif total2 > total:
+            nett_profit = total2 - total
+        total_liability = Decimal(current_liability_total) + Decimal(total_loan_amount) + nett_profit
+        total_assets = Decimal(current_assets_total) + nett_loss
+
+        context = {
+            'staff': staff,
+            'bank_ac': bank_account,
+            'loan_ac': loan_account,
+            'total_loan_amount': total_loan_amount,
+            'sundry_creditors': sundry_creditors,
+            'sundry_creditors_total': sundry_creditors_total,
+            'current_liability_total': current_liability_total,
+            'opening_stocks':opening_stocks,
+            'opening_stocks_total': opening_stocks_total,
+            'sundry_debitors': sundry_debitors,
+            'sundry_debitors_total': sundry_debitors_total,
+            'current_assets_total': current_assets_total,
+            'nett_loss': nett_loss,
+            'nett_profit': nett_profit,
+            'total_assets': total_assets,
+            'total_liability': total_liability,
+            'from_date': from_date,
+            'to_date': to_date,
+            'allmodules': allmodules,
+        }
+
+        return render(request, 'company/balancesheet_vertical.html', context)
+
+    except (staff_details.DoesNotExist, company.DoesNotExist, modules_list.DoesNotExist):
+        return redirect('/')
+
+   
+ 
+def balancesheet_mail_horizontal(request):
+    if request.method == 'GET':
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+
+        emails_string = request.GET.get('email_ids')
+        emails = [email.strip() for email in emails_string.split(',')]
+        mess = request.GET.get('email_message')
+        id = request.session.get('staff_id')
+        staff = staff_details.objects.get(id=id)
+
+        company_instance = company.objects.get(id=staff.company.id)
+        item_queryset = ItemModel.objects.filter(company=company_instance)
+        bank_account = BankModel.objects.filter(company=company_instance)
+        loan_account = LoanAccounts.objects.filter(company=company_instance)
+        balance_amounts = BalanceAmount.objects.filter(loan_account__company=company_instance)
+        sundry_creditors = SalesInvoice.objects.filter(company=company_instance)
+        opening_stocks = ItemModel.objects.filter(company=company_instance)
+        sundry_debitors = PurchaseBill.objects.filter(company=company_instance)
+        purchase = PurchaseBill.objects.filter(company=company_instance)
+        purdebit = purchasedebit.objects.filter(company=company_instance)
+        exp = Expense.objects.filter(expense_category_id__staff__company=company_instance)
+        sale = SalesInvoice.objects.filter(company=company_instance)  
+        cnote = CreditNote.objects.filter(company=company_instance)  
+        pbill = PurchaseBillItem.objects.filter(company=company_instance)
+        salesinvoice = SalesInvoiceItem.objects.filter(company=company_instance)
+        salesitem = sales_item.objects.filter(cmp=company_instance)
+        allmodules = modules_list.objects.get(company=staff.company, status='New')
+
+        if from_date and to_date:
             from_date = parse_date(from_date)
             to_date = parse_date(to_date)
             date_range = [from_date, to_date]
@@ -21420,17 +21544,14 @@ def vertical_balancesheet(request):
             salesinvoice = salesinvoice.filter(salesinvoice__date__range=date_range)
             salesitem = salesitem.filter(sale_order__orderdate__range=date_range)  
 
-        # Aggregate values with default fallback to 0
         total_bank_balance = bank_account.aggregate(total=Sum('current_balance'))['total'] or 0
         total_loan_amount = loan_account.aggregate(total=Sum('total_amount'))['total'] or 0
         total_loan_amount += total_bank_balance
         sundry_creditors_total = sundry_creditors.aggregate(total=Sum('totalbalance'))['total'] or 0
         current_liability_total = sundry_creditors.aggregate(total=Sum('totalbalance'))['total'] or 0
-        opening_stocks_total = opening_stocks.aggregate(total=Sum('item_opening_stock'))['total'] or 0
+        opening_stocks_total = opening_stocks.aggregate(total=Sum('item_current_stock'))['total'] or 0
         sundry_debitors_total = sundry_debitors.aggregate(total=Sum('balance'))['total'] or 0
         current_assets_total = opening_stocks_total + sundry_debitors_total
-
-        print(current_liability_total)
 
         total_purchase_amount = purchase.aggregate(total=Sum('subtotal'))['total'] or 0
         total_purdebit_amount = purdebit.aggregate(total=Sum('subtotal'))['total'] or 0
@@ -21443,7 +21564,6 @@ def vertical_balancesheet(request):
         total_discount_sinoitem = salesinvoice.aggregate(total=Sum('discount'))['total'] or 0
         total_discount_salesitem = salesitem.aggregate(total=Sum('discount'))['total'] or 0
 
-        # Convert to Decimal to ensure consistent type
         total_purchase_amount = Decimal(total_purchase_amount)
         total_purdebit_amount = Decimal(total_purdebit_amount)
         total_cnote_amount = Decimal(total_cnote_amount)
@@ -21466,7 +21586,7 @@ def vertical_balancesheet(request):
             nett_loss = total - total2
         elif total2 > total:
             nett_profit = total2 - total
-        total_liability = Decimal(current_liability_total) + Decimal(total_loan_amount)+ nett_profit
+        total_liability = Decimal(current_liability_total) + Decimal(total_loan_amount) + nett_profit
         total_assets = Decimal(current_assets_total) + nett_loss
 
         context = {
@@ -21477,139 +21597,7 @@ def vertical_balancesheet(request):
             'sundry_creditors': sundry_creditors,
             'sundry_creditors_total': sundry_creditors_total,
             'current_liability_total': current_liability_total,
-            'opening_stocks_total': opening_stocks_total,
-            'sundry_debitors': sundry_debitors,
-            'sundry_debitors_total': sundry_debitors_total,
-            'current_assets_total': current_assets_total,
-            'nett_loss': nett_loss,
-            'nett_profit': nett_profit,
-            'total_assets': total_assets,
-            'total_liability': total_liability,
-            'from_date': from_date,
-            'to_date': to_date,
-            'allmodules': allmodules,
-        }
-
-        return render(request, 'company/balancesheet_vertical.html', context)
-
-  except (staff_details.DoesNotExist, company.DoesNotExist, modules_list.DoesNotExist):
-        return redirect('/')
-
-   
- 
-def balancesheet_mail_horizontal(request):
-  if request.method == 'GET':
-        from_date = request.GET.get('from_date')
-        to_date = request.GET.get('to_date')
-        
-        emails_string = request.GET.get('email_ids')
-        emails = [email.strip() for email in emails_string.split(',')]
-        mess = request.GET.get('email_message')
-        id = request.session.get('staff_id')
-        staff = staff_details.objects.get(id=id)
-
-        
-        company_instance = company.objects.get(id=staff.company.id)
-        item_queryset = ItemModel.objects.filter(company=company_instance)
-        item_queryset = ItemModel.objects.filter(company=company_instance)
-        bank_account = BankModel.objects.filter(company=company_instance)
-        loan_account = LoanAccounts.objects.filter(company=company_instance)
-        balance_amounts = BalanceAmount.objects.filter(loan_account__company=company_instance)
-        sundry_creditors = SalesInvoice.objects.filter(company=company_instance)
-        opening_stocks = ItemModel.objects.filter(company=company_instance)
-        sundry_debitors = PurchaseBill.objects.filter(company=company_instance)
-        purchase = PurchaseBill.objects.filter(company=company_instance)
-        purdebit = purchasedebit.objects.filter(company=company_instance)
-        exp = Expense.objects.filter(expense_category_id__staff__company=company_instance)
-        sale = SalesInvoice.objects.filter(company=company_instance)  
-        cnote = CreditNote.objects.filter(company=company_instance)  
-        pbill = PurchaseBillItem.objects.filter(company=company_instance)
-        salesinvoice = SalesInvoiceItem.objects.filter(company=company_instance)
-        salesitem = sales_item.objects.filter(cmp=company_instance)
-        
-       
-        allmodules = modules_list.objects.get(company=staff.company, status='New')
-        
-        if from_date and to_date:
-            from_date = str(from_date)
-            to_date = str(to_date)
-            from_date = parse_date(from_date)
-            to_date = parse_date(to_date)
-        
-           
-            date_range = [from_date, to_date]
-            bank_account = bank_account.filter(as_of_date__range=date_range)
-            loan_account = loan_account.filter(date__range=date_range)
-            balance_amounts = balance_amounts.filter(loan_account__date__range=date_range)
-            sundry_creditors = sundry_creditors.filter(date__range=date_range)
-            opening_stocks = opening_stocks.filter(item_date__range=date_range)
-            sundry_debitors = sundry_debitors.filter(billdate_range=date_range)
-            purdebit = purdebit.filter(debitdate__range=date_range)
-            cnote = cnote.filter(date__range=date_range)
-            purchase = purchase.filter(billdate__range=date_range)
-            exp = exp.filter(expense_date__range=date_range)
-            sale = sale.filter(date__range=date_range)
-            pbill = pbill.filter(purchasebill__billdate__range=date_range)
-            salesinvoice = salesinvoice.filter(salesinvoice__date__range=date_range)
-            salesitem = salesitem.filter(sale_order__orderdate__range=date_range)  
-
-        # Aggregate values with default fallback to 0
-        total_bank_balance = bank_account.aggregate(total=Sum('current_balance'))['total'] or 0
-        total_loan_amount = loan_account.aggregate(total=Sum('total_amount'))['total'] or 0
-        total_loan_amount += total_bank_balance
-        sundry_creditors_total = sundry_creditors.aggregate(total=Sum('totalbalance'))['total'] or 0
-        current_liability_total = sundry_creditors.aggregate(total=Sum('totalbalance'))['total'] or 0
-        opening_stocks_total = opening_stocks.aggregate(total=Sum('item_opening_stock'))['total'] or 0
-        sundry_debitors_total = sundry_debitors.aggregate(total=Sum('balance'))['total'] or 0
-        current_assets_total = opening_stocks_total + sundry_debitors_total
-
-        print(current_liability_total)
-
-        total_purchase_amount = purchase.aggregate(total=Sum('subtotal'))['total'] or 0
-        total_purdebit_amount = purdebit.aggregate(total=Sum('subtotal'))['total'] or 0
-        total_cnote_amount = cnote.aggregate(total=Sum('subtotal'))['total'] or 0
-        total_exp_amount = exp.aggregate(total=Sum('Sub_total'))['total'] or 0
-        total_sale_amount = sale.aggregate(total=Sum('subtotal'))['total'] or 0
-        total_current_stock = item_queryset.aggregate(total=Sum('item_current_stock'))['total'] or 0
-        total_item_amount = item_queryset.aggregate(total=Sum('item_sale_price'))['total'] or 0
-        total_discount_pbill = pbill.aggregate(total=Sum('discount'))['total'] or 0
-        total_discount_sinoitem = salesinvoice.aggregate(total=Sum('discount'))['total'] or 0
-        total_discount_salesitem = salesitem.aggregate(total=Sum('discount'))['total'] or 0
-
-        # Convert to Decimal to ensure consistent type
-        total_purchase_amount = Decimal(total_purchase_amount)
-        total_purdebit_amount = Decimal(total_purdebit_amount)
-        total_cnote_amount = Decimal(total_cnote_amount)
-        total_exp_amount = Decimal(total_exp_amount)
-        total_sale_amount = Decimal(total_sale_amount)
-        total_current_stock = Decimal(total_current_stock)
-        total_item_amount = Decimal(total_item_amount)
-        total_discount_pbill = Decimal(total_discount_pbill)
-        total_discount_sinoitem = Decimal(total_discount_sinoitem)
-        total_discount_salesitem = Decimal(total_discount_salesitem)
-
-        total_sale = total_sale_amount - total_cnote_amount
-        total_purchase = total_purchase_amount - total_purdebit_amount
-        discount_paid = total_discount_sinoitem + total_discount_salesitem
-        total = total_item_amount + total_purchase + total_exp_amount + discount_paid
-        total2 = total_sale_amount + total_current_stock + total_discount_pbill
-
-        nett_profit = nett_loss = Decimal(0)
-        if total > total2:
-            nett_loss = total - total2
-        elif total2 > total:
-            nett_profit = total2 - total
-        total_liability = Decimal(current_liability_total) + Decimal(total_loan_amount)+ nett_profit
-        total_assets = Decimal(current_assets_total) + nett_loss
-
-        context = {
-            'staff': staff,
-            'bank_ac': bank_account,
-            'loan_ac': loan_account,
-            'total_loan_amount': total_loan_amount,
-            'sundry_creditors': sundry_creditors,
-            'sundry_creditors_total': sundry_creditors_total,
-            'current_liability_total': current_liability_total,
+            'opening_stocks':opening_stocks,
             'opening_stocks_total': opening_stocks_total,
             'sundry_debitors': sundry_debitors,
             'sundry_debitors_total': sundry_debitors_total,
@@ -21641,25 +21629,22 @@ def balancesheet_mail_horizontal(request):
         email.send(fail_silently=False)
         message = 'Report has been shared via email successfully..!'
         return JsonResponse({'message': message})
-  else:
+    else:
         message = 'Report cannot be sent..!'
-        return JsonResponse({'message': message}) 
-  
+        return JsonResponse({'message': message})
 
 def balancesheet_mail_vertical(request):
-     if request.method == 'GET':
+    if request.method == 'GET':
         from_date = request.GET.get('from_date')
         to_date = request.GET.get('to_date')
-        
+
         emails_string = request.GET.get('email_ids')
         emails = [email.strip() for email in emails_string.split(',')]
         mess = request.GET.get('email_message')
         id = request.session.get('staff_id')
         staff = staff_details.objects.get(id=id)
 
-        
         company_instance = company.objects.get(id=staff.company.id)
-        item_queryset = ItemModel.objects.filter(company=company_instance)
         item_queryset = ItemModel.objects.filter(company=company_instance)
         bank_account = BankModel.objects.filter(company=company_instance)
         loan_account = LoanAccounts.objects.filter(company=company_instance)
@@ -21675,23 +21660,18 @@ def balancesheet_mail_vertical(request):
         pbill = PurchaseBillItem.objects.filter(company=company_instance)
         salesinvoice = SalesInvoiceItem.objects.filter(company=company_instance)
         salesitem = sales_item.objects.filter(cmp=company_instance)
-        
-       
         allmodules = modules_list.objects.get(company=staff.company, status='New')
-        
+
         if from_date and to_date:
-            from_date = str(from_date)
-            to_date = str(to_date)
             from_date = parse_date(from_date)
             to_date = parse_date(to_date)
-            date_range = [from_date, to_date]
             date_range = [from_date, to_date]
             bank_account = bank_account.filter(as_of_date__range=date_range)
             loan_account = loan_account.filter(date__range=date_range)
             balance_amounts = balance_amounts.filter(loan_account__date__range=date_range)
             sundry_creditors = sundry_creditors.filter(date__range=date_range)
             opening_stocks = opening_stocks.filter(item_date__range=date_range)
-            sundry_debitors = sundry_debitors.filter(billdate_range=date_range)
+            sundry_debitors = sundry_debitors.filter(billdate__range=date_range)
             purdebit = purdebit.filter(debitdate__range=date_range)
             cnote = cnote.filter(date__range=date_range)
             purchase = purchase.filter(billdate__range=date_range)
@@ -21701,17 +21681,14 @@ def balancesheet_mail_vertical(request):
             salesinvoice = salesinvoice.filter(salesinvoice__date__range=date_range)
             salesitem = salesitem.filter(sale_order__orderdate__range=date_range)  
 
-        # Aggregate values with default fallback to 0
         total_bank_balance = bank_account.aggregate(total=Sum('current_balance'))['total'] or 0
         total_loan_amount = loan_account.aggregate(total=Sum('total_amount'))['total'] or 0
         total_loan_amount += total_bank_balance
         sundry_creditors_total = sundry_creditors.aggregate(total=Sum('totalbalance'))['total'] or 0
         current_liability_total = sundry_creditors.aggregate(total=Sum('totalbalance'))['total'] or 0
-        opening_stocks_total = opening_stocks.aggregate(total=Sum('item_opening_stock'))['total'] or 0
+        opening_stocks_total = opening_stocks.aggregate(total=Sum('item_current_stock'))['total'] or 0
         sundry_debitors_total = sundry_debitors.aggregate(total=Sum('balance'))['total'] or 0
         current_assets_total = opening_stocks_total + sundry_debitors_total
-
-        print(current_liability_total)
 
         total_purchase_amount = purchase.aggregate(total=Sum('subtotal'))['total'] or 0
         total_purdebit_amount = purdebit.aggregate(total=Sum('subtotal'))['total'] or 0
@@ -21724,7 +21701,6 @@ def balancesheet_mail_vertical(request):
         total_discount_sinoitem = salesinvoice.aggregate(total=Sum('discount'))['total'] or 0
         total_discount_salesitem = salesitem.aggregate(total=Sum('discount'))['total'] or 0
 
-        # Convert to Decimal to ensure consistent type
         total_purchase_amount = Decimal(total_purchase_amount)
         total_purdebit_amount = Decimal(total_purdebit_amount)
         total_cnote_amount = Decimal(total_cnote_amount)
@@ -21747,7 +21723,7 @@ def balancesheet_mail_vertical(request):
             nett_loss = total - total2
         elif total2 > total:
             nett_profit = total2 - total
-        total_liability = Decimal(current_liability_total) + Decimal(total_loan_amount)+ nett_profit
+        total_liability = Decimal(current_liability_total) + Decimal(total_loan_amount) + nett_profit
         total_assets = Decimal(current_assets_total) + nett_loss
 
         context = {
@@ -21758,6 +21734,7 @@ def balancesheet_mail_vertical(request):
             'sundry_creditors': sundry_creditors,
             'sundry_creditors_total': sundry_creditors_total,
             'current_liability_total': current_liability_total,
+            'opening_stocks':opening_stocks,
             'opening_stocks_total': opening_stocks_total,
             'sundry_debitors': sundry_debitors,
             'sundry_debitors_total': sundry_debitors_total,
@@ -21785,11 +21762,10 @@ def balancesheet_mail_vertical(request):
             from_email=settings.EMAIL_HOST_USER,
             to=emails
         )
-        email.attach(filename, pdf, "balancesheet/pdf")
+        email.attach(filename, pdf, "application/pdf")
         email.send(fail_silently=False)
         message = 'Report has been shared via email successfully..!'
         return JsonResponse({'message': message})
-     else:
+    else:
         message = 'Report cannot be sent..!'
-        return JsonResponse({'message': message}) 
-  
+        return JsonResponse({'message': message})
